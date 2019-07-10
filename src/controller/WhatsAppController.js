@@ -3,6 +3,7 @@ import {CameraController} from './CameraController'
 import {ElementsPrototype} from './../util/ElementsPrototype'
 import {DocumentPreviewController} from './DocumentPreviewController'
 import {MicrophoneController} from './MicrophoneController'
+import {Firebase} from './../util/Firebase'
 
 export class WhatsAppController{
 
@@ -14,6 +15,7 @@ export class WhatsAppController{
         this._element.elementsPrototype()
         this.loadElements()
         this.initEvents()
+        this._firebase = new Firebase()
     }
 
     loadElements(){
