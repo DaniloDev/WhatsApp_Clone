@@ -10,7 +10,7 @@ export class Firebase{
             authDomain: "whatsapp-clone-c6525.firebaseapp.com",
             databaseURL: "https://whatsapp-clone-c6525.firebaseio.com",
             projectId: "whatsapp-clone-c6525",
-            storageBucket: "",
+            storageBucket: "whatsapp-clone-c6525.appspot.com",
             messagingSenderId: "946024789427",
             appId: "1:946024789427:web:902e44858e1a7924"
           };
@@ -21,14 +21,14 @@ export class Firebase{
 
     init(){
 
-        if(!this._initalized){
+        if(!window._initalizedFirebase){
             firebase.initializeApp(this._config);
 
             firebase.firestore().settings({
-                timestampsInSnapshots: true
+                //timestampsInSnapshots: true
             })
 
-            this._initalized = true
+            window._initalizedFirebase = true
         }
     }
 
@@ -40,6 +40,29 @@ export class Firebase{
     static hd(){
 
         return firebase.storage()
+    }
+
+    initAuth(){
+
+        return new Promise((s, f)=>{
+
+            let provider = new firebase.auth.GoogleAuthProvider()
+
+            firebase.auth().signInWithPopup(provider)
+            .then(result=>{
+
+                let token = result.credential.acessToken
+                let user = result.user
+
+                s({
+                    user,
+                    token
+                })
+            })
+            .catch(err=>{
+                f(err)
+            })
+        })
     }
     
 

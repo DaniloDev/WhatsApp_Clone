@@ -1,21 +1,49 @@
-import {Format} from './../util/Format'
-import {CameraController} from './CameraController'
-import {ElementsPrototype} from './../util/ElementsPrototype'
-import {DocumentPreviewController} from './DocumentPreviewController'
-import {MicrophoneController} from './MicrophoneController'
-import {Firebase} from './../util/Firebase'
+import { Format } from './../util/Format'
+import { CameraController } from './CameraController'
+import { ElementsPrototype } from './../util/ElementsPrototype'
+import { DocumentPreviewController } from './DocumentPreviewController'
+import { MicrophoneController } from './MicrophoneController'
+import { Firebase } from './../util/Firebase'
+import { User } from '../model/User';
 
 export class WhatsAppController{
 
     constructor(){
 
+        this._firebase = new Firebase()
+        this.initAuth()
         this._documentPreview = new DocumentPreviewController()
         this._camera = new CameraController()
         this._element = new ElementsPrototype()
         this._element.elementsPrototype()
         this.loadElements()
         this.initEvents()
-        this._firebase = new Firebase()
+    }
+
+    initAuth(){
+
+        this._firebase.initAuth()
+        .then(response=>{
+
+            this._user = new User()
+                    
+            let userRef = User.findByEmail(response.user.email)
+
+            userRef.set({
+                name: response.user.displayName,
+                email: response.user.email,
+                photo: response.user.photoURL  
+            })
+            .then(()=>{
+
+                this.el.appContent.css({
+                    display:'flex'
+                })
+            })
+        })
+        .catch(err=>{
+            console.error(err)
+        })
     }
 
     loadElements(){
