@@ -3,8 +3,6 @@ import {CameraController} from './CameraController'
 import {ElementsPrototype} from './../util/ElementsPrototype'
 import {DocumentPreviewController} from './DocumentPreviewController'
 import {MicrophoneController} from './MicrophoneController'
-import {ClassEvent} from './../util/ClassEvent'
-
 
 export class WhatsAppController{
 
@@ -265,17 +263,25 @@ export class WhatsAppController{
             this.startRecordMicrophoneTime()
 
             this._microphoneController = new MicrophoneController()
+
+            this._microphoneController.on('ready', musica=>{
+
+                console.log('ready event')
+
+                this._microphoneController.startRecorder()
+            })
+
         })
 
         this.el.btnCancelMicrophone.on('click', e=>{
             
-            this._microphoneController.stop()
+            this._microphoneController.stopRecorder()
             this.closeRecordMicrophone()
         })
 
         this.el.btnFinishMicrophone.on('click', e=>{
             
-            this._microphoneController.stop()
+            this._microphoneController.stopRecorder()
             this.closeRecordMicrophone()
             
         })
