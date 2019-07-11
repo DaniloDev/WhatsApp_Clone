@@ -4,7 +4,8 @@ import { ElementsPrototype } from './../util/ElementsPrototype'
 import { DocumentPreviewController } from './DocumentPreviewController'
 import { MicrophoneController } from './MicrophoneController'
 import { Firebase } from './../util/Firebase'
-import { User } from '../model/User';
+import { User } from './../model/User'
+import { Chat } from './../model/Chat'    
 
 export class WhatsAppController{
 
@@ -52,6 +53,9 @@ export class WhatsAppController{
             this._user.name   = response.user.displayName
             this._user.email  = response.user.email
             this._user.photo  = response.user.photoURL
+
+
+            this._email = response.user.email
    
             this.el.appContent.css({
                 display:'flex'
@@ -65,7 +69,7 @@ export class WhatsAppController{
 
     saveEmailUser(){
 
-        this._user.email = response.user.email
+        this._user.email = this._email
 
         this._user.saveEmail().then(()=>{
                 
@@ -146,6 +150,8 @@ export class WhatsAppController{
                 }
 
                 div.on('click', e=>{
+
+                    console.log('chatId', contact.chatId)
 
                     this.el.activeName.innerHTML = contact.name
                     this.el.activeStatus.innerHTML = contact.status
@@ -254,12 +260,28 @@ export class WhatsAppController{
 
                 if(data.name){
 
-                    this._user.addContact(contact).then(()=>{
+                    Chat.createIfNotExists(this._user.email, contact.email).then(chat=>{
 
-                        this.el.btnClosePanelAddContact.click()
-                        console.info('Contato foi adicionado!')
+                        contact.chatId = chat.id
+
+                        this._user.chatId = chat.id
+
+                        if(this._user.email !== contact.email){
+
+                        contact.addContact(this._user)
+
+                        this._user.addContact(contact).then(()=>{
+
+                            this.el.btnClosePanelAddContact.click()
+                            console.info('Contato foi adicionado!')
+                        })
+                    }else{
+
+                        alert('ERRO : Você está tentando adicionar seu próprio contato!')
+                    }
+                        
                     })
-                    
+
                 }else{
 
                     console.error('Usuário não foi encontrado')
