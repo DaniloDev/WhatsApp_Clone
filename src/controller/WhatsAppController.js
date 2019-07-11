@@ -5,7 +5,8 @@ import { DocumentPreviewController } from './DocumentPreviewController'
 import { MicrophoneController } from './MicrophoneController'
 import { Firebase } from './../util/Firebase'
 import { User } from './../model/User'
-import { Chat } from './../model/Chat'    
+import { Chat } from './../model/Chat'
+import { Message } from './../model/Message'
 
 export class WhatsAppController{
 
@@ -151,21 +152,7 @@ export class WhatsAppController{
 
                 div.on('click', e=>{
 
-                    console.log('chatId', contact.chatId)
-
-                    this.el.activeName.innerHTML = contact.name
-                    this.el.activeStatus.innerHTML = contact.status
-
-                    if(contact.photo){
-                        let img = this.el.activePhoto
-                        img.src = contact.photo
-                        img.show()
-                    }
-
-                    this.el.home.hide()
-                    this.el.main.css({
-                        display: 'flex'
-                    })
+                    this.setAciveChat(contact)
                 })
             
 
@@ -175,6 +162,26 @@ export class WhatsAppController{
         })
         
         this._user.getContacts()
+    }
+
+    setAciveChat(contact){
+
+        this._contactActive = contact
+
+        this.el.activeName.innerHTML = contact.name
+        this.el.activeStatus.innerHTML = contact.status
+
+        if(contact.photo){
+            let img = this.el.activePhoto
+            img.src = contact.photo
+            img.show()
+        }
+
+        this.el.home.hide()
+        this.el.main.css({
+            display: 'flex'
+        })
+
     }
 
     loadElements(){
@@ -518,7 +525,15 @@ export class WhatsAppController{
 
         this.el.btnSend.on('click', e=>{
 
-            console.log(this.el.inputText.innerHTML)
+            Message.send(
+                this._contactActive.chatId, 
+                this._user.email,
+                'text',
+                this.el.inputText.innerHTML)
+            
+            this.el.inputText.innerHTML = ''
+
+            this.el.panelEmojis.removeClass('open')
         })
 
         this.el.btnEmojis.on('click', e=>{
