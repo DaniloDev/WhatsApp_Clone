@@ -10,13 +10,13 @@ export class User extends Model{
         if(id) this.getById(id)
     }
 
-    get name(){ return this._data.name; }
-    set name(value){ this._data.name = value; }
+    get name(){ return this._data.name }
+    set name(value){ this._data.name = value }
 
-    get email(){ return this._data.email; }
+    get email(){ return this._data.email }
     set email(value){ this._data.email = value; }
 
-    get photo(){ return this._data.photo; }
+    get photo(){ return this._data.photo }
     set photo(value){ this._data.photo = value; }
 
     getById(id){
