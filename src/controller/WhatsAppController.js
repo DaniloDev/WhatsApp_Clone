@@ -46,22 +46,32 @@ export class WhatsAppController{
                 }
 
                  this.initContacts()
+                 this.saveEmailUser()
             })
 
             this._user.name   = response.user.displayName
             this._user.email  = response.user.email
             this._user.photo  = response.user.photoURL
-
-            this._user.save().then(()=>{
-                
-                this.el.appContent.css({
-                    display:'flex'
-                })
+   
+            this.el.appContent.css({
+                display:'flex'
             })
-            
+           
         })
         .catch(err=>{
             console.error(err)
+        })
+    }
+
+    saveEmailUser(){
+
+        this._user.email = response.user.email
+
+        this._user.saveEmail().then(()=>{
+                
+            this.el.appContent.css({
+                display:'flex'
+            })
         })
     }
     
