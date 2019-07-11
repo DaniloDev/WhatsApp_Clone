@@ -64,7 +64,5 @@ export class ElementsPrototype{
             })
             return json
         }
-
-
     }
 }
