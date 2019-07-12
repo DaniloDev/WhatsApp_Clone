@@ -48,7 +48,7 @@ export class WhatsAppController{
                 }
 
                  this.initContacts()
-                 this.saveEmailUser()
+                 //this.saveEmailUser()
             })
 
             this._user.name   = response.user.displayName
@@ -56,19 +56,27 @@ export class WhatsAppController{
             this._user.photo  = response.user.photoURL
 
 
-            this._email = response.user.email
+            /*this._email = response.user.email
    
             this.el.appContent.css({
                 display:'flex'
             })
-           
+           */
+
+          this._user.save().then(()=>{
+                
+            this.el.appContent.css({
+                display:'flex'
+            })
+        })
+
         })
         .catch(err=>{
             console.error(err)
         })
     }
 
-    saveEmailUser(){
+    /*saveEmailUser(){
 
         this._user.email = this._email
 
@@ -78,7 +86,7 @@ export class WhatsAppController{
                 display:'flex'
             })
         })
-    }
+    }*/
     
     initContacts(){
 
@@ -245,6 +253,17 @@ export class WhatsAppController{
     }
 
     initEvents(){
+
+        this.el.inputSearchContacts.on('keyup', e=>{
+
+            if(this.el.inputSearchContacts.value.length > 0){
+                this.el.inputSearchContactsPlaceholder.hide()
+            }else{
+                this.el.inputSearchContactsPlaceholder.show()
+            }
+
+            this._user.getContacts(this.el.inputSearchContacts.value)
+        })
 
         this.el.myPhoto.on('click', e=>{
             
@@ -551,16 +570,17 @@ export class WhatsAppController{
 
         this.el.inputText.on('keypress', e=>{
 
-            if(e.key === 'Enter' && !e.ctrlKey){
+                if(e.key === 'Enter' && !e.ctrlKey){
         
-                e.preventDefault()
-                this.el.btnSend.click()
-            }
-        })
+                    e.preventDefault()
+                    this.el.btnSend.click()
+                } 
+          })
+
 
         this.el.inputText.on('keyup', e=>{
 
-            if(this.el.inputText.innerHTML.length){
+            if(this.el.inputText.innerHTML.trim().length){
 
                 this.el.inputPlaceholder.hide()
                 this.el.btnSendMicrophone.hide()
@@ -574,15 +594,23 @@ export class WhatsAppController{
 
         this.el.btnSend.on('click', e=>{
 
-            Message.send(
-                this._contactActive.chatId, 
-                this._user.email,
-                'text',
-                this.el.inputText.innerHTML)
-            
-            this.el.inputText.innerHTML = ''
+            let textNoSpace = this.el.inputText.innerHTML.trim().length
 
-            this.el.panelEmojis.removeClass('open')
+            if (textNoSpace > 0){
+                    
+                Message.send(
+                    this._contactActive.chatId, 
+                    this._user.email,
+                    'text',
+                    this.el.inputText.innerHTML)
+                
+                this.el.inputText.innerHTML = ''
+
+                this.el.panelEmojis.removeClass('open')
+            }else{
+
+                return false
+            }
         })
 
         this.el.btnEmojis.on('click', e=>{

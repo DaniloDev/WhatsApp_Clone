@@ -40,11 +40,11 @@ export class User extends Model{
         return User.findByEmail(this.email).set(this.toJSON())
     }
 
-    saveEmail(){
+    /*saveEmail(){
 
         return User.findByEmail(this.email).set(this.toJSON())
     }
-
+*/
     static getRef(){
 
         return Firebase.db().collection('/users')
@@ -70,11 +70,11 @@ export class User extends Model{
         .set(contact.toJSON());
     }
     
-    getContacts(){
+    getContacts(filter = ''){
 
         return new Promise((s, f)=>{
 
-            User.getContactsRef(this.email).onSnapshot(docs=>{
+            User.getContactsRef(this.email).where('name', '>=', filter).onSnapshot(docs=>{
 
                 let contacs = []
 
