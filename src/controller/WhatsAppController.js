@@ -282,7 +282,7 @@ export class WhatsAppController{
 
         this.el.myPhoto.on('click', e=>{
             
-            this.closeAllLeftPaneel()
+            this.closeAllLeftPanel()
             this.el.panelEditProfile.show()
             setTimeout(()=>{
                 this.el.panelEditProfile.addClass('open')
@@ -291,7 +291,7 @@ export class WhatsAppController{
 
         this.el.btnNewContact.on('click', e=>{
 
-            this.closeAllLeftPaneel()
+            this.closeAllLeftPanel()
             this.el.panelAddContact.show()
             setTimeout(()=>{
                 this.el.panelAddContact.addClass('open')
@@ -454,7 +454,56 @@ export class WhatsAppController{
 
         this.el.btnSendPicture.on('click', e=>{
 
-            console.log(this.el.pictureCamera.src)
+            this.el.btnSendPicture.disabled = true
+
+            let regex = /^data:(.+);base64,(.*)$/;
+            let result = this.el.pictureCamera.src.match(regex)
+            let mimeType = result[1]
+            let ext = mimeType.split('/')[1]
+            let filename = `camera${Date.now()}.${ext}`
+
+            let picture = new Image()
+            picture.src = this.el.pictureCamera.src
+
+            picture.onload = e=>{
+
+                let canvas = document.createElement('canvas')
+                let context = canvas.getContext('2d')
+
+                canvas.width = picture.width
+                canvas.height = picture.height
+
+                context.translate(picture.width, 0)
+                context.scale(-1, 1)
+
+                context.drawImage(picture, 0, 0,  canvas.width, canvas.height)
+
+                fetch(canvas.toDataURL(mimeType))
+                    .then(res => { return res.arrayBuffer() })
+                    .then(buffer =>{ return new File([buffer], filename), {
+                        type: mimeType
+                    }}).then(file =>{
+        
+                        Message.sendImage(this._contactActive,
+                            this._user.email,
+                            file)
+        
+                        this.el.btnSendPicture.disabled = false
+                        
+                        this.closeAllLeftPanel()
+                        this._camera.stop()
+                        this.el.btnReshootPanelCamera.hide()
+                        this.el.pictureCamera.hide()
+                        this.el.videoCamera.show()
+                        this.el.containerSendPicture.hide()
+                        this.el.containerTakePicture.show()
+                        this.el.panelMessagesContainer.show()
+                })
+            
+            
+            }
+
+
         })
 
         this.el.btnAttachDocument.on('click', e=>{
@@ -693,7 +742,7 @@ export class WhatsAppController{
         this.el.menuAttach.removeClass('open')
     }
 
-    closeAllLeftPaneel(){
+    closeAllLeftPanel(){
 
         this.el.panelAddContact.hide()
         this.el.panelEditProfile.hide()
